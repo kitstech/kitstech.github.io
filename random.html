@@ -3,8 +3,10 @@
 <head>
     <meta charset="utf-8">
     <script>
-        var r = Math.floor(Math.random() * 10) + 1;
-        document.getElementById('target').value(r);
+        (function(){
+            var r = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('target').value(r);
+        })();
     </script>
 </head>
 <body>
