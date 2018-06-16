@@ -3,10 +3,13 @@
 <head>
     <meta charset="utf-8">
     <script>
-        (function(){
-            var r = Math.floor(Math.random() * 10) + 1;
-            document.getElementById('target').innerHTML = r;
-        })();
+        document.onreadystatechange = function(){
+            if(document.readyState == 'complete'){
+                var r = Math.floor(Math.random() * 10) + 1;
+                var target = document.getElementById('target');
+                target.innerHTML = r;
+            }
+        };
     </script>
 </head>
 <body>
