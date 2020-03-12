@@ -1,0 +1,32 @@
+div.table {
+    display: table;
+    table-layout: fixed;
+}
+div.table > div {
+    display: table-row;
+}
+div.table > div > div {
+    display: table-cell;
+}
+div.table > div.colgroup {
+    display: table-column-group;
+}
+div.table > div.colgroup > div.col {
+    display: table-column;
+}
+div.table > div > div.th {
+    background-color: #eee;
+    text-align: center;
+    font-weight: bold;
+}
+
+div.table:not(.non-border) > div > div {
+    border-top: 1px solid #999;
+    border-left: 1px solid #999;
+}
+div.table:not(.non-border) > div:last-child > div {
+    border-bottom: 1px solid #999;
+}
+div.table:not(.non-border) > div > div:last-child {
+    border-right: 1px solid #999;
+}

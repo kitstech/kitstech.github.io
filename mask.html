@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ajax Test Page</title>
+<link rel="stylesheet" type="text/css" href="./css/loading.css">
+<link rel="stylesheet" type="text/css" href="./css/divtable.css">
+<script type="text/javascript" src="./js/base.js"></script>
+<script type="text/javascript" src="./data/regCode.js"></script>
+<script type="text/javascript">
+document.onreadystatechange = function() {
+    if(document.readyState == "complete") {
+        init();
+    }
+};
+const keys = ['addr', 'created_at', 'name', 'remain_stat', 'stock_at'];
+function setList() {
+    const url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json';
+    kits.loading.show();
+    kits.ajax(url, {address: getArea()}, function(result, successFlag) {
+        const target = document.getElementById('list');
+        target.innerHTML = '';
+        document.getElementById('totalCnt').innerHTML = '';
+        if(successFlag) {
+            document.getElementById('totalCnt').innerHTML = 'Searched ' + result.count + ' Rows';
+            if(result.count > 0) {
+                const arr = result.stores;
+                target.append(makeHeader(arr[0]));
+                for(const obj of arr) {
+                    target.append(makeRow(obj));
+                }
+            }
+        }
+        kits.loading.hide();
+    }, 'GET');
+}
+function makeHeader(obj) {
+	const tr = document.createElement('div');
+	for(const key in obj) {
+		if(keys.indexOf(key) === -1) {
+			continue;
+		}
+		const td = document.createElement('div');
+		td.classList.add('th');
+		td.innerHTML = key;
+		tr.appendChild(td);
+	}
+	return tr;
+}
+function makeRow(obj) {
+    const tr = document.createElement('div');
+    for(const key in obj) {
+        if(keys.indexOf(key) > -1) {
+            const td = document.createElement('div');
+            td.innerHTML = obj[key];
+            if(key == 'remain_stat') {
+                const v = obj[key];
+                if(v === 'plenty') {
+                    td.style.backgroundColor = '#e2efda';
+                } else if(v === 'some') {
+                    td.style.backgroundColor = '#fffccc';
+                } else if(v === 'few') {
+                    td.style.backgroundColor = '#fbcfd0';
+                } else if(v === 'empty') {
+                    td.style.backgroundColor = '#e6e6e6';
+                }
+            }
+            tr.append(td);
+        }
+    }
+    return tr;
+}
+
+function init() {
+    const initCode1 = '1100000000';
+    const initCode2 = '1168000000';
+
+    const area1 = document.getElementById('area1');
+    regCode1.forEach(function(v, i) {
+        const opt = document.createElement('option');
+        opt.value = v.code;
+        opt.innerHTML = v.name;
+        if(v.code === initCode1) {
+            opt.setAttribute('selected', 'selected');
+        }
+        area1.appendChild(opt);
+    });
+    
+    area1.onchange = function(e) {
+        area2.innerHTML = '';
+        regCode2[this.value].forEach(function(v, i) {
+            const opt = document.createElement('option');
+            opt.value = v.code;
+            opt.innerHTML = v.name;
+            area2.appendChild(opt);
+        });
+    };
+    
+    const area2 = document.getElementById('area2');
+    regCode2[initCode1].forEach(function(v, i) {
+        const opt = document.createElement('option');
+        opt.value = v.code;
+        opt.innerHTML = v.name;
+        if(v.code === initCode2) {
+            opt.setAttribute('selected', 'selected');
+        }
+        area2.appendChild(opt);
+    });
+    
+    document.getElementById('btnSrch').onclick = function(e) {
+        setList();
+    };
+}
+function getArea() {
+    const area1 = document.getElementById('area1');
+    const area2 = document.getElementById('area2');
+    const text1 = area1.options[area1.selectedIndex].text;
+    const text2 = (area2.selectedIndex < 0) ? '' : area2.options[area2.selectedIndex].text;
+    return text1 + (text2 === '' ? '' : ' '+ text2);
+}
+</script>
+<style>
+* {margin: 0;padding: 0;font-size: 1rem;}
+html, body {width: 100%; height: 100%;}
+
+div.table > div:hover {background-color: #d9e1f2;}
+div.table > div:hover > div {background-color: #d9e1f2 !important;}
+div.table > div:hover > div > span {background-color: #d9e1f2 !important;}
+
+div.table > div > div {vertical-align: middle;}
+div.table > div > div:nth-child(2) {width: 15%;text-align: center;}
+div.table > div > div:nth-child(3) {width: 20%;text-align: center;}
+div.table > div > div:nth-child(4) {width: 10%;text-align: center;}
+div.table > div > div:nth-child(5) {width: 15%;text-align: center;}
+
+.head {width: 100%;height: 5rem;border-bottom: 1px dotted gray;padding-top: 1rem;}
+.head .cond {display: inline-block;padding-left: 1rem;}
+.head .cond select {width: 10rem;height: 2rem;}
+.head .cond button {width: 5rem;height: 2rem;}
+.head .cond label {font-size: 1.2rem;}
+.head .info {display: inline-block;}
+
+.head .util {padding-right: 1rem;text-align: right;}
+.head .util a {text-decoration: none;color: #666;display: inline-block;width: 5rem;height: 2rem;line-height: 2rem;text-align: center;background-color: #eee;border: 1px solid #ccc;}
+
+.body {width: 100%;height: 52rem;overflow-y: scroll;}
+</style>
+</head>
+<body>
+    <div class="head">
+        <div class="cond">
+            <select id="area1"></select>
+            <select id="area2"></select>
+            <button id="btnSrch">Search</button>
+            <input type="checkbox" name="remainStat" id="chkPlenty" value="plenty" checked="checked"><label for="chkPlenty">plenty</label>
+            <input type="checkbox" name="remainStat" id="chkSome" value="some" checked="checked"><label for="chkSome">some</label>
+            <input type="checkbox" name="remainStat" id="chkFew" value="few" checked="checked"><label for="chkFew">few</label>
+            <input type="checkbox" name="remainStat" id="chkEmpty" value="empty" checked="checked"><label for="chkEmpty">empty</label>
+        </div>
+        <div class="info">
+            <div id="totalCnt"></div>
+        </div>
+        <div class="util">
+            <a href="#up">▲</a>
+            <a href="#down">▼</a>
+        </div>
+    </div>
+    <div class="body">
+        <div id="up" class="none"></div>
+        <div>
+            <div id="list" class="table"></div>
+        </div>
+        <div id="down" class="none"></div>
+    </div>
+</body>
+</html>
