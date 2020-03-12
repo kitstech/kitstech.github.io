@@ -51,6 +51,9 @@ function makeRow(obj) {
     const tr = document.createElement('div');
     for(const key in obj) {
         if(keys.indexOf(key) > -1) {
+            if(getCheckedList().indexOf(obj['remain_stat']) === -1) {
+                continue;
+            }
             const td = document.createElement('div');
             td.innerHTML = obj[key];
             if(key == 'remain_stat') {
@@ -117,6 +120,16 @@ function getArea() {
     const text1 = area1.options[area1.selectedIndex].text;
     const text2 = (area2.selectedIndex < 0) ? '' : area2.options[area2.selectedIndex].text;
     return text1 + (text2 === '' ? '' : ' '+ text2);
+}
+function getCheckedList() {
+	var list = [];
+	var el = document.getElementsByName('remainStat');
+	el.forEach(function(v, i) {
+		if(v.checked) {
+			list.push(v.value);
+		}
+	});
+	return list;
 }
 </script>
 <style>
