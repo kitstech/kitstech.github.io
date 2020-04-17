@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Canvas Test Page</title>
+<style>
+html {
+    font-family: sans-serif;
+}
+canvas {
+    background: #fff;
+    border: 1px dashed;
+}
+a {
+    display: inline-block;
+    background: #69c;
+    color: #fff;
+    padding: 5px;
+}
+.palette div {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #fff;
+}
+.palette div:hover {
+    border-bottom: 2px solid #000;
+}
+.palette div.selected {
+    border: 2px solid #000;
+}
+select {
+    width: 30px;
+}
+</style>
+<script type="text/javascript">
+var canvas, c, isDrawing, posX, posY;
+document.onreadystatechange = function() {
+	if(document.readyState == "complete") {
+        setColors();
+        getColor();
+
+        document.getElementById('clear').onclick = function() {
+            clear();
+        }
+
+        canvas = document.querySelector('canvas');
+        c = canvas.getContext('2d');
+
+        canvas.addEventListener('mousemove', function(e) {
+            draw(e.offsetX, e.offsetY);
+            posX = e.offsetX;
+            posY = e.offsetY;
+        });
+        canvas.addEventListener('mousedown', function(e) { posX = e.offsetX; posY = e.offsetY; isDrawing = true });
+        canvas.addEventListener('mouseup', function(e) { isDrawing = false });
+
+        document.querySelector('a').addEventListener('click', event =>
+            event.target.href = canvas.toDataURL()
+        );
+	}
+};
+
+function draw(x, y) {
+    if (isDrawing) {
+        c.lineWidth = document.getElementById('lineWidth').value;
+        c.strokeStyle = getColor();
+        c.beginPath();
+        c.moveTo(posX, posY);
+        c.lineTo(x, y);
+        c.stroke();
+    }
+}
+
+function setColors() {
+    const colorArray = ['red', 'orange', 'yellow', 'green', 'blue', 'navy', 'purple'];
+    const target = document.querySelector('.palette');
+    colorArray.forEach(function(v, i) {
+        let div = document.createElement('div');
+        div.style.backgroundColor = v;
+        if(i === 0) {
+            div.classList.add('selected');
+        }
+        div.onclick = function() {
+            blurNfocus(this);
+        };
+        target.appendChild(div);
+    });
+}
+
+function getColor() {
+    const selected = document.querySelector('.palette div.selected');
+    return selected.style.backgroundColor;
+}
+
+function blurNfocus(clicked) {
+    const colors = document.querySelectorAll('.palette div');
+    colors.forEach(function(v, i) {
+        if(v === clicked) {
+            v.classList.add('selected');
+        } else {
+            v.classList.remove('selected');
+        }
+    });
+}
+
+function clear() {
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    c.beginPath();
+}
+</script>
+</head>
+<body>
+    <div class="palette"></div>
+    <p>
+        <label>Line Width: 
+            <select id="lineWidth">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+            </select>
+        </label>
+        <button id="clear">Clear</button>
+        <a href="" download="painting.png">Download</a>
+    </p>
+    <canvas width="500" height="500"></canvas>
+</body>
+</html>
