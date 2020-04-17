@@ -38,7 +38,6 @@ var canvas, c, isDrawing, posX, posY;
 document.onreadystatechange = function() {
 	if(document.readyState == "complete") {
         setColors();
-        getColor();
 
         document.getElementById('clear').onclick = function() {
             clear();
@@ -53,7 +52,7 @@ document.onreadystatechange = function() {
             posY = e.offsetY;
         });
         canvas.addEventListener('mousedown', function(e) { posX = e.offsetX; posY = e.offsetY; isDrawing = true });
-        canvas.addEventListener('mouseup', function(e) { isDrawing = false });
+        canvas.addEventListener('mouseup', () => isDrawing = false);
 
         document.querySelector('a').addEventListener('click', event =>
             event.target.href = canvas.toDataURL()
