@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Camel Converter</title>
+<script type="text/javascript">
+const kits = {};
+kits.case = {
+	under2camel: function(str) {
+		return str.toLowerCase().replace(/(\_[a-z])/g, function(arg) {
+			return arg.toUpperCase().replace("_", "");
+		});
+	},
+	camel2under: function(str) {
+		return str.replace(/([A-Z])/g, function(arg) {
+			return "_" + arg.toLowerCase();
+		}).toUpperCase();
+	}
+};
+
+document.onreadystatechange = function(){
+	if(document.readyState == "complete"){
+		var keyMap = {};//16:Shift, 17:Control, 18:Alt, 32:SpaceBar, 37:←, 38:↑, 39:→, 40:↓
+		document.body.onkeydown = function(e){
+			keyMap[e.keyCode] = true;
+		};
+		document.body.onkeyup = function(e){
+			keyMap[e.keyCode] = false;
+			if((keyMap[17] && e.keyCode == 32)) {//Ctrl + SpaceBar
+				clearText();
+			}
+			if(keyMap[17] && e.keyCode == 40) {//Ctrl + ↓
+				camelConverter(true);
+			}
+			if(keyMap[17] && e.keyCode == 38) {//Ctrl + ↑
+				camelConverter(false);
+			}
+			if(keyMap[17] && e.keyCode == 37) {//Ctrl + ←
+				document.getElementById("prefix").focus();
+			}
+			if(keyMap[17] && e.keyCode == 39) {//Ctrl + →
+				document.getElementById("suffix").focus();
+			}
+		};
+
+		document.getElementById("text1").ondblclick = function(e) {
+			this.select();
+			document.execCommand('copy');
+		};
+		document.getElementById("text2").ondblclick = function(e) {
+			this.select();
+			document.execCommand('copy');
+		};
+	}
+}
+
+function setFixes(str) {
+	var prefix = document.getElementById("prefix").value;
+	var suffix = document.getElementById("suffix").value;
+	var arr = str.split("\n");
+	
+	for(var i=0; i<arr.length; i++) {
+		arr[i] = arr[i].replace(/^/g, prefix);
+		arr[i] = arr[i].replace(/$/g, suffix);
+	}
+	str = arr.join("\n");
+	
+	return str;
+}
+
+function camelConverter(flag) {
+	var text1 = document.getElementById("text1").value;
+	var text2 = document.getElementById("text2").value.split("\n");
+	var result = "";
+	if(flag){
+		result += kits.case.under2camel(text1) + "";
+		document.getElementById("text2").value = setFixes(result);
+	}else{
+		for(var i=0; i<text2.length; i++){
+			if(kits.case.camel2under(text2[i]) != ""){
+				if(i==0){
+					result += kits.case.camel2under(text2[i]);
+				}else{
+					result += "\n" + kits.case.camel2under(text2[i]);
+				}
+			}
+		}
+		document.getElementById("text1").value = setFixes(result);
+	}
+}
+
+function clearText() {
+	document.getElementById("text1").value = "";
+	document.getElementById("text2").value = "";
+	document.getElementById("prefix").value = "";
+	document.getElementById("suffix").value = "";
+}
+</script>
+</head>
+<body>
+	<textarea rows="20" cols="100" id="text1"></textarea>
+	<hr/>
+	<button onclick="camelConverter(true);" title="Ctrl + ↓">▼under2camel▼</button>
+	<button onclick="camelConverter(false);" title="Ctrl + ↑">▲camel2under▲</button>
+	<input type="text" id="prefix" placeholder="prefix" title="Ctrl + ←"/>
+	<input type="text" id="suffix" placeholder="suffix" title="Ctrl + →"/>
+	<button onclick="clearText();" title="Ctrl + SpaceBar">clear</button>
+	<hr/>
+	<textarea rows="20" cols="100" id="text2"></textarea>
+</body>
+</html>
